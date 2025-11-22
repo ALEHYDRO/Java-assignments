@@ -31,4 +31,7 @@ public class LoginView {
         
         return new Scene(grid, 400, 300);
     }
+    public Button getRegisterButton() {
+    return registerButton;
+}
 }

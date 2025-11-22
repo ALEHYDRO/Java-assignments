@@ -3,105 +3,134 @@ import javafx.stage.Stage;
 
 public class BankingApp extends Application {
     private Stage primaryStage;
-    private DashboardController dashboardController;
+    private String currentCustomerId; // Track current user
     
     // Views
     private LoginView loginView;
     private DashboardView dashboardView;
+    private RegistrationView registrationView;
+    private AccountsView accountsView;
     private DepositView depositView;
     private WithdrawView withdrawView;
-    private AccountsView accountsView;
     private TransactionHistoryView transactionHistoryView;
+    private OpenAccountView openAccountView; 
     
     // Controllers
     private LoginController loginController;
+    private DashboardController dashboardController;
+    private RegistrationController registrationController;
+    private OpenAccountController openAccountController;
     private AccountController accountController;
-    
+
     @Override
     public void start(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        initializeViews();
-        setupNavigation();
+        try {
+            this.primaryStage = primaryStage;
+            primaryStage.setTitle("Banking System");
+            
+            // Initialize sample accounts FIRST
+            AccountManager.initializeSampleAccounts();
+            
+            // Create all views
+            loginView = new LoginView();
+            dashboardView = new DashboardView();
+            registrationView = new RegistrationView();
+            accountsView = new AccountsView();
+            depositView = new DepositView();
+            withdrawView = new WithdrawView();
+            transactionHistoryView = new TransactionHistoryView();
+            openAccountView = new OpenAccountView();
+            
+            // Create controllers
+            loginController = new LoginController(loginView, this);
+            dashboardController = new DashboardController(dashboardView, this);
+            registrationController = new RegistrationController(registrationView, loginView, primaryStage);
+            openAccountController = new OpenAccountController(openAccountView, dashboardView, primaryStage, this); // Added 'this'
+            accountController = new AccountController(depositView, withdrawView, accountsView, transactionHistoryView, this);
+            
+            // Set up navigation from login to registration
+            loginView.registerButton.setOnAction(e -> {
+                primaryStage.setScene(registrationView.getScene());
+            });
+            
+            // Start with login screen
+            primaryStage.setScene(loginView.getScene());
+            primaryStage.show();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private String currentUsername;
+    
+    // NEW: Handle successful login
+    public void handleSuccessfulLogin(String customerId, String username) {
+    this.currentCustomerId = customerId;
+    this.currentUsername = username;
+    
+    // Ensure admin has sample accounts
+    if ("admin".equals(username)) {
+        AccountManager.ensureUserHasSampleAccounts(customerId, username);
+    }
+    
+    accountController.setCurrentUser(customerId);
+    showDashboard();
+}
+    
+    // NEW: Handle logout
+    public void handleLogout() {
+        this.currentCustomerId = null;
+        accountController.clearCurrentUser();
         showLoginView();
     }
     
-    private void initializeViews() {
-        // Create all views
-        loginView = new LoginView();
-        dashboardView = new DashboardView();
-        depositView = new DepositView();
-        withdrawView = new WithdrawView();
-        accountsView = new AccountsView();
-        transactionHistoryView = new TransactionHistoryView();
-        
-        // Create controllers
-        loginController = new LoginController(loginView, this);
-        accountController = new AccountController(depositView, withdrawView, accountsView, transactionHistoryView);
-        
-        // Populate sample data for demo
-        populateSampleData();
-    }
-    
-// Replace the entire setupNavigation() method with:
-private void setupNavigation() {
-    // Create dashboard controller to handle navigation
-    new DashboardController(dashboardView, this);
-    
-    // Back button handlers (keep these)
-    depositView.backButton.setOnAction(e -> showDashboard());
-    withdrawView.backButton.setOnAction(e -> showDashboard());
-    accountsView.backButton.setOnAction(e -> showDashboard());
-    transactionHistoryView.backButton.setOnAction(e -> showDashboard());
-}
-    
-    private void populateSampleData() {
-        // Add sample accounts to combo boxes
-        depositView.accountComboBox.getItems().addAll("SAV001 - Savings", "INV001 - Investment", "CHQ001 - Cheque");
-        withdrawView.accountComboBox.getItems().addAll("SAV001 - Savings", "INV001 - Investment", "CHQ001 - Cheque");
-        transactionHistoryView.accountComboBox.getItems().addAll("SAV001 - Savings", "INV001 - Investment", "CHQ001 - Cheque");
-        
-        // Set sample balance
-        depositView.currentBalanceLabel.setText("Current Balance: BWP 1,500.75");
-        withdrawView.currentBalanceLabel.setText("Current Balance: BWP 1,500.75");
-        withdrawView.accountTypeLabel.setText("Account Type: Savings Account");
+    // NEW: Get current customer ID
+    public String getCurrentCustomerId() {
+        return currentCustomerId;
     }
     
     // Navigation methods
+    public void showDashboard() {
+        primaryStage.setScene(dashboardView.getScene());
+    }
+    
     public void showLoginView() {
         primaryStage.setScene(loginView.getScene());
-        primaryStage.setTitle("Banking System - Login");
-        primaryStage.show();
-    }
-    
-    public void showDashboard() {
-        dashboardView.welcomeLabel.setText("Welcome, Alex! 👋");
-        dashboardView.messageLabel.setText("Last login: " + java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("MMM dd, yyyy HH:mm")));
-        primaryStage.setScene(dashboardView.getScene());
-        primaryStage.setTitle("Banking System - Dashboard");
-    }
-    
-    public void showDepositView() {
-        primaryStage.setScene(depositView.getScene());
-        primaryStage.setTitle("Banking System - Deposit Funds");
-    }
-    
-    public void showWithdrawView() {
-        primaryStage.setScene(withdrawView.getScene());
-        primaryStage.setTitle("Banking System - Withdraw Funds");
     }
     
     public void showAccountsView() {
-        // Refresh accounts data when view is shown
-        accountController.handleRefreshAccounts();
+        accountController.refreshAccountData();
         primaryStage.setScene(accountsView.getScene());
-        primaryStage.setTitle("Banking System - My Accounts");
+    }
+    
+    public void showDepositView() {
+        accountController.refreshAccountData();
+        primaryStage.setScene(depositView.getScene());
+    }
+    
+    public void showWithdrawView() {
+        accountController.refreshAccountData();
+        primaryStage.setScene(withdrawView.getScene());
     }
     
     public void showTransactionHistoryView() {
+        accountController.refreshAccountData();
         primaryStage.setScene(transactionHistoryView.getScene());
-        primaryStage.setTitle("Banking System - Transaction History");
     }
     
+    public void showRegistrationView() {
+        primaryStage.setScene(registrationView.getScene());
+    }
+    
+    public void showOpenAccountView() {
+        primaryStage.setScene(openAccountView.getScene());
+    }
+
+    public String getCurrentUsername() {
+    return currentUsername;
+}
+
     public static void main(String[] args) {
         launch(args);
     }

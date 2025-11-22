@@ -13,12 +13,7 @@ public class DashboardController {
         view.depositButton.setOnAction(e -> bankingApp.showDepositView());
         view.withdrawButton.setOnAction(e -> bankingApp.showWithdrawView());
         view.transactionHistoryButton.setOnAction(e -> bankingApp.showTransactionHistoryView());
-        view.logoutButton.setOnAction(e -> bankingApp.showLoginView());
-        view.openAccountButton.setOnAction(e -> handleOpenAccount());
-    }
-    
-    private void handleOpenAccount() {
-        view.messageLabel.setText("Open Account feature coming soon!");
-        view.messageLabel.setStyle("-fx-text-fill: blue;");
+        view.logoutButton.setOnAction(e -> bankingApp.handleLogout()); // Updated to use handleLogout()
+        view.openAccountButton.setOnAction(e -> bankingApp.showOpenAccountView());
     }
 }

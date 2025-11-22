@@ -2,8 +2,8 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -14,7 +14,6 @@ public class TransactionHistoryView {
     public DatePicker fromDatePicker = new DatePicker();
     public DatePicker toDatePicker = new DatePicker();
     public Button searchButton = new Button("Search Transactions");
-    public Button exportButton = new Button("Export to CSV");
     public Button backButton = new Button("Back to Dashboard");
     public Label messageLabel = new Label();
     
@@ -53,10 +52,10 @@ public class TransactionHistoryView {
             new Label("Date Range:"), fromDatePicker, new Label("to"), toDatePicker
         );
         
-        // Search buttons
+        // Search buttons - REMOVED exportButton
         HBox searchButtons = new HBox(10);
         searchButtons.setAlignment(Pos.CENTER);
-        searchButtons.getChildren().addAll(searchButton, exportButton);
+        searchButtons.getChildren().addAll(searchButton); // Only search button
         
         searchBox.getChildren().addAll(accountRow, dateRow, searchButtons);
         

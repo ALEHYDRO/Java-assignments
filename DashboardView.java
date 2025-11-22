@@ -19,6 +19,7 @@ public class DashboardView {
     public Label messageLabel = new Label(); // Added missing message label
     
     public Scene getScene() {
+    
         VBox mainLayout = new VBox(20);
         mainLayout.setAlignment(Pos.TOP_CENTER);
         mainLayout.setPadding(new Insets(30, 50, 50, 50));
