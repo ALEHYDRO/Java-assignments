@@ -1,3 +1,5 @@
+import java.lang.classfile.Label;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -20,7 +22,7 @@ public class WithdrawView {
         VBox mainLayout = new VBox(20);
         mainLayout.setAlignment(Pos.TOP_CENTER);
         mainLayout.setPadding(new Insets(30));
-        mainLayout.setStyle("-fx-background-color: #ecf0f1;");
+        mainLayout.setStyle("-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);");
         
         Text title = new Text("Withdraw Funds");
         title.setFont(Font.font(20));

@@ -22,7 +22,7 @@ public class DashboardView {
         VBox mainLayout = new VBox(20);
         mainLayout.setAlignment(Pos.TOP_CENTER);
         mainLayout.setPadding(new Insets(30, 50, 50, 50));
-        mainLayout.setStyle("-fx-background-color: #ecf0f1;");
+        mainLayout.setStyle("-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);");
         
         Text title = new Text("Banking System");
         title.setFont(Font.font(24));
