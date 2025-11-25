@@ -1,3 +1,5 @@
+import java.lang.classfile.Label;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -19,20 +21,24 @@ public class DepositView {
         VBox mainLayout = new VBox(20);
         mainLayout.setAlignment(Pos.TOP_CENTER);
         mainLayout.setPadding(new Insets(30));
+        mainLayout.setStyle("-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);");
         
         Text title = new Text("Deposit Funds");
         title.setFont(Font.font(20));
+        title.setStyle("-fx-fill: #2c3e50; -fx-font-weight: bold;");
         
         GridPane formGrid = new GridPane();
         formGrid.setAlignment(Pos.CENTER_LEFT);
         formGrid.setHgap(15);
         formGrid.setVgap(15);
         formGrid.setPadding(new Insets(25));
-        formGrid.setStyle("-fx-border-color: #cccccc; -fx-border-width: 1px; -fx-background-color: #f9f9f9;");
+        formGrid.setStyle("-fx-border-color: #bdc3c7; -fx-border-width: 1px; -fx-background-color: white; -fx-background-radius: 5;");
         
         accountComboBox.setPromptText("Select Account");
         accountComboBox.setPrefWidth(250);
+        accountComboBox.setStyle("-fx-padding: 5px;");
         amountField.setPromptText("Enter amount");
+        amountField.setStyle("-fx-padding: 5px;");
         
         formGrid.add(new Label("Select Account:"), 0, 0);
         formGrid.add(accountComboBox, 1, 0);
@@ -40,6 +46,9 @@ public class DepositView {
         formGrid.add(amountField, 1, 1);
         formGrid.add(new Label("BWP"), 2, 1);
         formGrid.add(currentBalanceLabel, 1, 2);
+        
+        depositButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8px 15px;");
+        backButton.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8px 15px;");
         
         GridPane buttonGrid = new GridPane();
         buttonGrid.setAlignment(Pos.CENTER);

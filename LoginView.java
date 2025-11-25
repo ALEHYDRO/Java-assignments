@@ -20,10 +20,24 @@ public class LoginView {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
+        grid.setStyle("-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);");
         
-        grid.add(new Label("Username:"), 0, 0);
+        usernameField.setStyle("-fx-pref-width: 200px; -fx-padding: 8px;");
+        passwordField.setStyle("-fx-pref-width: 200px; -fx-padding: 8px;");
+        
+        loginButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 100px; -fx-padding: 8px;");
+        registerButton.setStyle("-fx-background-color: #27ae60; -fx-text-fill: white; -fx-font-weight: bold; -fx-pref-width: 100px; -fx-padding: 8px;");
+        
+        messageLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+        
+        Label userLabel = new Label("Username:");
+        Label passLabel = new Label("Password:");
+        userLabel.setStyle("-fx-text-fill: white;");
+        passLabel.setStyle("-fx-text-fill: white;");
+        
+        grid.add(userLabel, 0, 0);
         grid.add(usernameField, 1, 0);
-        grid.add(new Label("Password:"), 0, 1);
+        grid.add(passLabel, 0, 1);
         grid.add(passwordField, 1, 1);
         grid.add(loginButton, 1, 2);
         grid.add(registerButton, 0, 2);
