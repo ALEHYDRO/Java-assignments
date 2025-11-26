@@ -48,7 +48,8 @@ private void handleRegistration() {
         );
         
         if (success) {
-            registrationView.messageLabel.setText("Registration successful! Please login with your username.");
+            // SHOW CLEAR CONFIRMATION
+            registrationView.messageLabel.setText("✅ Registration successful! You can now login with your username.");
             registrationView.messageLabel.setStyle("-fx-text-fill: green;");
             registrationView.clearForm();
         } else {

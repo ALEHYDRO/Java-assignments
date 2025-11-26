@@ -20,67 +20,76 @@ public class OpenAccountController {
     }
     
     private void handleCreateAccount() {
-        try {
-            // Validate input
-            if (view.initialDepositField.getText().isEmpty()) {
-                view.messageLabel.setText("Please enter initial deposit!");
-                view.messageLabel.setStyle("-fx-text-fill: red;");
-                return;
-            }
-            
-            double initialDeposit;
-            try {
-                initialDeposit = Double.parseDouble(view.initialDepositField.getText());
-            } catch (NumberFormatException e) {
-                view.messageLabel.setText("Please enter valid deposit amount!");
-                view.messageLabel.setStyle("-fx-text-fill: red;");
-                return;
-            }
-            
-            String accountType = view.accountTypeCombo.getValue();
-            
-            // Check requirements
-            if (accountType.equals("Investment Account") && initialDeposit < 500) {
-                view.messageLabel.setText("Investment account requires BWP 500 minimum!");
-                view.messageLabel.setStyle("-fx-text-fill: red;");
-                return;
-            }
-            
-            // Only require company info for Cheque accounts
-            if (accountType.equals("Cheque Account")) {
-                if (view.companyNameField.getText().isEmpty() || view.companyAddressField.getText().isEmpty()) {
-                    view.messageLabel.setText("Cheque account requires company information!");
-                    view.messageLabel.setStyle("-fx-text-fill: red;");
-                    return;
-                }
-            }
-            
-            // Get current customer ID from BankingApp
-            String customerId = bankingApp.getCurrentCustomerId();
-            if (customerId == null) {
-                view.messageLabel.setText("Error: Please log in first");
-                view.messageLabel.setStyle("-fx-text-fill: red;");
-                return;
-            }
-            
-            // Create account
-            String accountNumber = generateAccountNumber();
-            
-            // Create and store the account for the CURRENT USER
-            SimpleAccount newAccount = new SimpleAccount(accountNumber, accountType, initialDeposit);
-            AccountManager.addAccount(newAccount, customerId); // Use current user's ID
-            
-            String message = createAccountMessage(accountType, accountNumber, initialDeposit);
-            
-            view.messageLabel.setText(message);
-            view.messageLabel.setStyle("-fx-text-fill: green;");
-            view.clearForm();
-            
-        } catch (Exception e) {
-            view.messageLabel.setText("Account creation completed!");
-            view.messageLabel.setStyle("-fx-text-fill: blue;");
+    try {
+        // Validate input
+        if (view.initialDepositField.getText().isEmpty()) {
+            view.messageLabel.setText("Please enter initial deposit!");
+            view.messageLabel.setStyle("-fx-text-fill: red;");
+            return;
         }
+        
+        double initialDeposit;
+        try {
+            initialDeposit = Double.parseDouble(view.initialDepositField.getText());
+        } catch (NumberFormatException e) {
+            view.messageLabel.setText("Please enter valid deposit amount!");
+            view.messageLabel.setStyle("-fx-text-fill: red;");
+            return;
+        }
+        
+        String accountType = view.accountTypeCombo.getValue();
+        
+        // ENFORCE MINIMUM DEPOSITS STRICTLY
+        if (accountType.equals("Savings Account") && initialDeposit < 50) {
+            view.messageLabel.setText("Savings account requires BWP 50 minimum deposit!");
+            view.messageLabel.setStyle("-fx-text-fill: red;");
+            return;
+        }
+        
+        if (accountType.equals("Investment Account") && initialDeposit < 500) {
+            view.messageLabel.setText("Investment account requires BWP 500 minimum deposit!");
+            view.messageLabel.setStyle("-fx-text-fill: red;");
+            return;
+        }
+        
+        // Only require company info for Cheque accounts
+        if (accountType.equals("Cheque Account")) {
+            if (view.companyNameField.getText().isEmpty() || view.companyAddressField.getText().isEmpty()) {
+                view.messageLabel.setText("Cheque account requires company information!");
+                view.messageLabel.setStyle("-fx-text-fulfill: red;");
+                return;
+            }
+        }
+        
+        // Get current customer ID from BankingApp
+        String customerId = bankingApp.getCurrentCustomerId();
+        if (customerId == null) {
+            view.messageLabel.setText("Error: Please log in first");
+            view.messageLabel.setStyle("-fx-text-fill: red;");
+            return;
+        }
+        
+        // Create account
+        String accountNumber = generateAccountNumber();
+        
+        // Create and store the account for the CURRENT USER
+        SimpleAccount newAccount = new SimpleAccount(accountNumber, accountType, initialDeposit);
+        AccountManager.addAccount(newAccount, customerId);
+        
+        // SHOW SUCCESS CONFIRMATION
+        String message = "✅ " + accountType + " created successfully!\n" +
+                        "Account Number: " + accountNumber + "\n" +
+                        "Initial Balance: BWP " + String.format("%.2f", initialDeposit);
+        
+        view.messageLabel.setText(message);
+        view.messageLabel.setStyle("-fx-text-fill: green;");
+        view.clearForm();
+        
+    } catch (Exception e) {
+        view.messageLabel.setText("Error creating account. Please try again.");
+        view.messageLabel.setStyle("-fx-text-fill: red;");
     }
+}
     
     private String createAccountMessage(String accountType, String accountNumber, double balance) {
         String message = "";

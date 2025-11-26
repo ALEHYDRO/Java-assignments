@@ -30,6 +30,7 @@ public class LoginController {
     UserManager.User user = UserManager.authenticate(username, password);
     
     if (user != null) {
+        // CLEAR MESSAGE AFTER SUCCESSFUL LOGIN
         view.messageLabel.setText("Login successful! Welcome, " + user.getDisplayName());
         view.messageLabel.setStyle("-fx-text-fill: green;");
         
@@ -38,6 +39,19 @@ public class LoginController {
         
         // Pass both customer ID and username to BankingApp
         bankingApp.handleSuccessfulLogin(user.getCustomerId(), username);
+        
+        // CLEAR THE MESSAGE AFTER A DELAY SO IT DOESN'T SHOW ON LOGOUT
+        new java.util.Timer().schedule( 
+            new java.util.TimerTask() {
+                @Override
+                public void run() {
+                    javafx.application.Platform.runLater(() -> {
+                        view.messageLabel.setText("");
+                    });
+                }
+            }, 
+            3000 // Clear after 3 seconds
+        );
         
     } else {
         view.messageLabel.setText("Invalid username or password");

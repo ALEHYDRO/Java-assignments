@@ -5,6 +5,11 @@ public class SavingsAccount extends Account implements InterestCalculator {
         super(accNum, owner, Math.max(deposit, 50.0));
     }
 
+    public boolean withdraw(double amount) {
+        System.out.println("Error: Withdrawals not allowed for Savings accounts");
+        return false; // Always fail withdrawals
+    }
+
     public void CalculateInterest() {
         double interest = balance * INTEREST_RATE;
         balance += interest;
