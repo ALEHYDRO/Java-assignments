@@ -20,7 +20,9 @@ public class LoginView {
         grid.setHgap(10);
         grid.setVgap(10);
         grid.setPadding(new Insets(25, 25, 25, 25));
-        grid.setStyle("-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);");
+        
+        // CHANGE BACK TO WHITE BACKGROUND
+        grid.setStyle("-fx-background-color: white;");
         
         usernameField.setStyle("-fx-pref-width: 200px; -fx-padding: 8px;");
         passwordField.setStyle("-fx-pref-width: 200px; -fx-padding: 8px;");
@@ -30,10 +32,11 @@ public class LoginView {
         
         messageLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
         
+        // CREATE LABELS WITH DARK TEXT COLOR
         Label userLabel = new Label("Username:");
         Label passLabel = new Label("Password:");
-        userLabel.setStyle("-fx-text-fill: white;");
-        passLabel.setStyle("-fx-text-fill: white;");
+        userLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
+        passLabel.setStyle("-fx-text-fill: black; -fx-font-weight: bold;");
         
         grid.add(userLabel, 0, 0);
         grid.add(usernameField, 1, 0);
@@ -46,6 +49,6 @@ public class LoginView {
         return new Scene(grid, 400, 300);
     }
     public Button getRegisterButton() {
-    return registerButton;
-}
+        return registerButton;
+    }
 }

@@ -6,12 +6,12 @@ public class CompanyCustomer extends Customer {
 
     // Default constructor
     public CompanyCustomer() {
-        super(generateId(), "", "", "");
+        super(generateId(), "", "", "",false);
     }
 
     // Constructor for CustomerDAO
     public CompanyCustomer(String customerId, String companyName, String email, String phoneNumber, String address, String customerType) {
-        super(customerId, companyName, address, email);
+        super(customerId, companyName, address,email,false);
         this.companyName = companyName;
         this.email = email;
         this.phoneNumber = phoneNumber;

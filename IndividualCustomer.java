@@ -7,7 +7,7 @@ public class IndividualCustomer extends Customer {
 
     // Default constructor - calls super with generated ID
     public IndividualCustomer() {
-        super(generateId(), "", "", "");
+        super(generateId(), "", "", "",true);
     }
 
     // Getters and setters
@@ -47,9 +47,9 @@ public class IndividualCustomer extends Customer {
         return "CUST" + System.currentTimeMillis();
     }
 
-    // Add this constructor to your existing IndividualCustomer class
+    
 public IndividualCustomer(String customerId, String firstName, String lastName, String email, String phoneNumber, String address, String customerType) {
-    super(customerId, firstName + " " + lastName, address, email); // Assuming email is contact
+    super(customerId, firstName + " " + lastName, address, email,true); 
     this.firstName = firstName;
     this.lastName = lastName;
     this.email = email;
