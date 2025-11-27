@@ -1,18 +1,20 @@
+import java.util.List;
+
 import javafx.stage.Stage;
 
 public class OpenAccountController {
     private OpenAccountView view;
     private DashboardView dashboardView;
     private Stage primaryStage;
-    private BankingApp bankingApp; // Add reference to BankingApp
+    private BankingApp bankingApp;
     
     public OpenAccountController(OpenAccountView view, DashboardView dashboardView, Stage primaryStage, BankingApp bankingApp) {
-    this.view = view;
-    this.dashboardView = dashboardView;
-    this.primaryStage = primaryStage;
-    this.bankingApp = bankingApp; // Store the reference
-    setupHandlers();
-}
+        this.view = view;
+        this.dashboardView = dashboardView;
+        this.primaryStage = primaryStage;
+        this.bankingApp = bankingApp;
+        setupHandlers();
+    }
     
     private void setupHandlers() {
         view.createButton.setOnAction(e -> handleCreateAccount());
@@ -21,10 +23,17 @@ public class OpenAccountController {
     
     private void handleCreateAccount() {
     try {
+        // CHECK IF USER IS LOGGED IN
+        if (!bankingApp.isUserLoggedIn()) {
+            view.messageLabel.setText("❌ Please login first to create an account!");
+            view.messageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
+            return;
+        }
+        
         // Validate input
         if (view.initialDepositField.getText().isEmpty()) {
-            view.messageLabel.setText("Please enter initial deposit!");
-            view.messageLabel.setStyle("-fx-text-fill: red;");
+            view.messageLabel.setText("❌ Please enter initial deposit!");
+            view.messageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             return;
         }
         
@@ -32,116 +41,74 @@ public class OpenAccountController {
         try {
             initialDeposit = Double.parseDouble(view.initialDepositField.getText());
         } catch (NumberFormatException e) {
-            view.messageLabel.setText("Please enter valid deposit amount!");
-            view.messageLabel.setStyle("-fx-text-fill: red;");
+            view.messageLabel.setText("❌ Please enter valid deposit amount!");
+            view.messageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             return;
         }
         
         String accountType = view.accountTypeCombo.getValue();
         
-        // ENFORCE MINIMUM DEPOSITS STRICTLY
+        // ENFORCE MINIMUM DEPOSITS
         if (accountType.equals("Savings Account") && initialDeposit < 50) {
-            view.messageLabel.setText("Savings account requires BWP 50 minimum deposit!");
-            view.messageLabel.setStyle("-fx-text-fill: red;");
+            view.messageLabel.setText("❌ Savings account requires BWP 50 minimum deposit!");
+            view.messageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             return;
         }
         
         if (accountType.equals("Investment Account") && initialDeposit < 500) {
-            view.messageLabel.setText("Investment account requires BWP 500 minimum deposit!");
-            view.messageLabel.setStyle("-fx-text-fill: red;");
+            view.messageLabel.setText("❌ Investment account requires BWP 500 minimum deposit!");
+            view.messageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
             return;
         }
         
         // Only require company info for Cheque accounts
         if (accountType.equals("Cheque Account")) {
             if (view.companyNameField.getText().isEmpty() || view.companyAddressField.getText().isEmpty()) {
-                view.messageLabel.setText("Cheque account requires company information!");
-                view.messageLabel.setStyle("-fx-text-fulfill: red;");
+                view.messageLabel.setText("❌ Cheque account requires company information!");
+                view.messageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
                 return;
             }
         }
         
-        // Get current customer ID from BankingApp
-        String customerId = bankingApp.getCurrentCustomerId();
-        if (customerId == null) {
-            view.messageLabel.setText("Error: Please log in first");
-            view.messageLabel.setStyle("-fx-text-fill: red;");
-            return;
-        }
-        
-        // Create account
+        // Create account - FIX: Generate account number first
         String accountNumber = generateAccountNumber();
+        String customerId = bankingApp.getCurrentCustomerId();
         
-        // Create and store the account for the CURRENT USER
+        // FIX: Create account object - remove duplicate declaration
         SimpleAccount newAccount = new SimpleAccount(accountNumber, accountType, initialDeposit);
-        AccountManager.addAccount(newAccount, customerId);
+        boolean success = AccountManager.addAccount(newAccount, customerId);
         
-        // SHOW SUCCESS CONFIRMATION
-        String message = "✅ " + accountType + " created successfully!\n" +
-                        "Account Number: " + accountNumber + "\n" +
-                        "Initial Balance: BWP " + String.format("%.2f", initialDeposit);
-        
-        view.messageLabel.setText(message);
-        view.messageLabel.setStyle("-fx-text-fill: green;");
-        view.clearForm();
+        if (success) {
+    // SHOW SUCCESS IN GUI
+    String message = "✅ ACCOUNT CREATED SUCCESSFULLY!\n" +
+                    "Account: " + accountNumber + " (" + accountType + ")\n" +
+                    "Initial Balance: BWP " + String.format("%.2f", initialDeposit);
+    
+    view.messageLabel.setText(message);
+    view.messageLabel.setStyle("-fx-text-fill: #27ae60; -fx-font-weight: bold; -fx-font-size: 14px;");
+    
+    // Clear only the input fields, keep message
+    view.initialDepositField.clear();
+    view.companyNameField.clear();
+    view.companyAddressField.clear();
+    
+    // REFRESH ACCOUNTS VIEW
+    bankingApp.refreshAccountsView();
+    
+} else {
+    view.messageLabel.setText("❌ Failed to create account. Please try again.");
+    view.messageLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+}
         
     } catch (Exception e) {
-        view.messageLabel.setText("Error creating account. Please try again.");
-        view.messageLabel.setStyle("-fx-text-fill: red;");
+        view.messageLabel.setText("❌ Error creating account. Please try again.");
+        view.messageLabel.setStyle("-fx-text-fill: red; -fx-font-weight: bold;");
     }
 }
-    
-    private String createAccountMessage(String accountType, String accountNumber, double balance) {
-        String message = "";
-        
-        switch (accountType) {
-            case "Savings Account":
-                message = String.format(
-                    "✅ SAVINGS ACCOUNT CREATED SUCCESSFULLY!%n%n" +
-                    "Account Number: %s%n" +
-                    "Account Type: Savings Account%n" +
-                    "Initial Balance: BWP %.2f%n" +
-                    "Monthly Interest: 0.05%%%n" +
-                    "Features: Secure savings, no withdrawals%n%n" +
-                    "Your account is now active and ready to use!",
-                    accountNumber, balance
-                );
-                break;
-                
-            case "Investment Account":
-                message = String.format(
-                    "📈 INVESTMENT ACCOUNT CREATED SUCCESSFULLY!%n%n" +
-                    "Account Number: %s%n" +
-                    "Account Type: Investment Account%n" +
-                    "Initial Balance: BWP %.2f%n" +
-                    "Monthly Interest: 5%%%n" +
-                    "Features: High returns, withdrawals allowed%n%n" +
-                    "Start growing your money today!",
-                    accountNumber, balance
-                );
-                break;
-                
-            case "Cheque Account":
-                String companyName = view.companyNameField.getText();
-                message = String.format(
-                    "💳 CHEQUE ACCOUNT CREATED SUCCESSFULLY!%n%n" +
-                    "Account Number: %s%n" +
-                    "Account Type: Cheque Account%n" +
-                    "Initial Balance: BWP %.2f%n" +
-                    "Company: %s%n" +
-                    "Features: Salary deposits, unlimited transactions%n%n" +
-                    "Perfect for your business banking needs!",
-                    accountNumber, balance, companyName
-                );
-                break;
-        }
-        
-        return message;
-    }
-    
-    private String generateAccountNumber() {
-        return "ACC" + (100000 + (int)(Math.random() * 900000));
-    }
+
+private String generateAccountNumber() {
+    return "ACC" + (100000 + (int)(Math.random() * 900000));
+}
     
     private void goBackToDashboard() {
         primaryStage.setScene(dashboardView.getScene());

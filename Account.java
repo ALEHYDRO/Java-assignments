@@ -21,18 +21,9 @@ public abstract class Account {
         System.out.println("Deposited P" + amount + " | New balance: P" + balance);
     }
 
-    public boolean withdraw(double amount) { // CHANGE TO RETURN BOOLEAN
-        if (amount > balance) {
-            System.out.println("Error: Insufficient funds.");
-            return false;
-        } else {
-            balance -= amount;
-            transactions.add("WITHDRAWAL: P" + amount + " | Balance: P" + balance); // RECORD TRANSACTION
-            System.out.println("Withdrew P" + amount + " | New balance: P" + balance);
-            return true;
-        }
-    }
-
+     // MAKE WITHDRAW ABSTRACT - each account type implements its own rules
+    public abstract boolean withdraw(double amount);
+    
     // ADDED METHOD TO GET TRANSACTIONS
     public List<String> getTransactions() {
         return transactions;

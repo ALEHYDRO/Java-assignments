@@ -24,14 +24,14 @@ public class DashboardView {
         mainLayout.setPadding(new Insets(30, 50, 50, 50));
         mainLayout.setStyle("-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);");
         
-        Text title = new Text("Banking System");
+        Text title = new Text("HYDRO'S Banking System");
         title.setFont(Font.font(24));
         title.setStyle("-fx-fill: #2c3e50; -fx-font-weight: bold;");
         
-        welcomeLabel.setFont(Font.font(16));
+        welcomeLabel.setFont(Font.font(18));
         welcomeLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #2c3e50;");
         
-        messageLabel.setStyle("-fx-text-fill: #3498db;");
+        messageLabel.setStyle("-fx-text-fill: #3498db; -fx-font-weight: bold; -fx-font-size: 14px;");
         
         Button[] buttons = {viewAccountsButton, depositButton, withdrawButton, 
                            openAccountButton, transactionHistoryButton, logoutButton};

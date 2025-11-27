@@ -7,6 +7,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.scene.paint.Color;
+import java.util.List;
 
 public class AccountsView {
     public Button refreshButton = new Button("Refresh");
@@ -19,7 +20,7 @@ public class AccountsView {
         VBox mainLayout = new VBox(20);
         mainLayout.setAlignment(Pos.TOP_CENTER);
         mainLayout.setPadding(new Insets(30));
-        mainLayout.setStyle("-fx-background-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);");
+        mainLayout.setStyle("-fx-background-color: #ecf0f1;");
         
         Text title = new Text("My Accounts");
         title.setFont(Font.font(20));
@@ -34,9 +35,10 @@ public class AccountsView {
         accountsContainer.setStyle("-fx-border-color: #bdc3c7; -fx-border-width: 1px; -fx-background-color: white; -fx-background-radius: 5;");
         accountsContainer.setPrefWidth(400);
         
-        Label sampleAccount = new Label("No accounts found. Accounts will appear here.");
-        sampleAccount.setStyle("-fx-text-fill: #7f8c8d; -fx-font-style: italic;");
-        accountsContainer.getChildren().add(sampleAccount);
+        // Initial message
+        Label initialMessage = new Label("Please login to access your accounts");
+        initialMessage.setStyle("-fx-text-fill: #7f8c8d; -fx-font-style: italic;");
+        accountsContainer.getChildren().add(initialMessage);
         
         refreshButton.setStyle("-fx-background-color: #3498db; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8px 15px;");
         backButton.setStyle("-fx-background-color: #95a5a6; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 8px 15px;");
@@ -54,6 +56,36 @@ public class AccountsView {
         return new Scene(mainLayout, 500, 500);
     }
     
+    // ADD THIS METHOD TO LOAD ACCOUNTS
+    public void loadAccountsForUser(String customerId) {
+        accountsContainer.getChildren().clear();
+        
+        if (customerId == null) {
+            Label loginMessage = new Label("Please login to access your accounts");
+            loginMessage.setStyle("-fx-text-fill: #7f8c8d; -fx-font-style: italic;");
+            accountsContainer.getChildren().add(loginMessage);
+            totalBalanceLabel.setText("Total Balance: BWP 0.00");
+            return;
+        }
+        
+        // Get accounts for the user (you'll need to implement this in AccountManager)
+        List<SimpleAccount> userAccounts = AccountManager.getCustomerAccounts(customerId);
+        
+        if (userAccounts == null || userAccounts.isEmpty()) {
+            Label noAccounts = new Label("No accounts found. Open a new account to get started!");
+            noAccounts.setStyle("-fx-text-fill: #7f8c8d; -fx-font-style: italic;");
+            accountsContainer.getChildren().add(noAccounts);
+            totalBalanceLabel.setText("Total Balance: BWP 0.00");
+        } else {
+            double total = 0;
+            for (SimpleAccount account : userAccounts) {
+                addAccountDisplay(account.getAccountNumber(), account.getAccountType(), account.getBalance());
+                total += account.getBalance();
+            }
+            totalBalanceLabel.setText("Total Balance: BWP " + String.format("%.2f", total));
+        }
+    }
+    
     public void addAccountDisplay(String accountNumber, String accountType, double balance) {
         HBox accountBox = new HBox(20);
         accountBox.setAlignment(Pos.CENTER_LEFT);
@@ -68,11 +100,6 @@ public class AccountsView {
         
         accountInfo.getChildren().addAll(accNumber, accType, accBalance);
         accountBox.getChildren().add(accountInfo);
-        
-        if (!accountsContainer.getChildren().isEmpty() && 
-            accountsContainer.getChildren().get(0).getStyle().contains("italic")) {
-            accountsContainer.getChildren().clear();
-        }
         
         accountsContainer.getChildren().add(accountBox);
     }

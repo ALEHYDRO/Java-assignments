@@ -11,26 +11,28 @@ public class AccountManager {
     
     // Method to ensure a user has sample accounts (for admin)
     public static void ensureUserHasSampleAccounts(String customerId, String username) {
-        if (customerId == null) return;
-        
-        // Check if user already has accounts
-        List<SimpleAccount> userAccounts = getCustomerAccounts(customerId);
-        if (userAccounts.isEmpty() && "admin".equals(username)) {
-            // Create sample accounts only for admin
-            SimpleAccount savings = new SimpleAccount("SAV001", "Savings Account", 1500.75);
-            SimpleAccount investment = new SimpleAccount("INV001", "Investment Account", 5000.00);
-            SimpleAccount cheque = new SimpleAccount("CHQ001", "Cheque Account", 25000.50);
-            
-            addAccount(savings, customerId);
-            addAccount(investment, customerId);
-            addAccount(cheque, customerId);
-            
-            System.out.println("Sample accounts created for admin: " + customerId);
-        }
-    }
+    if (customerId == null) return;
     
-    // Add a new account
-    public static void addAccount(SimpleAccount account, String customerId) {
+    // Check if user already has accounts
+    List<SimpleAccount> userAccounts = getCustomerAccounts(customerId);
+    if (userAccounts.isEmpty() && "admin".equals(username)) {
+        // Create sample accounts only for admin
+        SimpleAccount savings = new SimpleAccount("SAV001", "Savings Account", 1500.75);
+        SimpleAccount investment = new SimpleAccount("INV001", "Investment Account", 5000.00);
+        SimpleAccount cheque = new SimpleAccount("CHQ001", "Cheque Account", 2500.50);
+        
+        addAccount(savings, customerId);
+        addAccount(investment, customerId);
+        addAccount(cheque, customerId);
+        
+        System.out.println("✅ Sample accounts created for admin: " + customerId);
+    } else if (!userAccounts.isEmpty()) {
+        System.out.println("✅ User already has " + userAccounts.size() + " accounts");
+    }
+}
+    
+    // Add a new account - FIXED: Added return statement
+    public static boolean addAccount(SimpleAccount account, String customerId) {
         accounts.put(account.getAccountNumber(), account);
         
         // Add to customer's account list
@@ -40,6 +42,8 @@ public class AccountManager {
         customerAccounts.get(customerId).add(account);
         
         System.out.println("Account added: " + account.getAccountNumber() + " for customer: " + customerId);
+        
+        return true; // ← ADD THIS RETURN STATEMENT
     }
     
     // Get all accounts for a customer

@@ -1,19 +1,16 @@
 public class LoginController {
     private LoginView view;
-    private BankingApp bankingApp;  // Add this field
+    private BankingApp bankingApp;
     
-    // Update constructor to accept BankingApp
     public LoginController(LoginView view, BankingApp bankingApp) {
         this.view = view;
-        this.bankingApp = bankingApp;  // Store the reference
+        this.bankingApp = bankingApp;
         setupEventHandlers();
     }
     
     private void setupEventHandlers() {
         view.loginButton.setOnAction(e -> handleLogin());
         view.registerButton.setOnAction(e -> handleRegister());
-        
-        // Enter key support for login
         view.passwordField.setOnAction(e -> handleLogin());
     }
     
@@ -30,28 +27,21 @@ public class LoginController {
     UserManager.User user = UserManager.authenticate(username, password);
     
     if (user != null) {
-        // CLEAR MESSAGE AFTER SUCCESSFUL LOGIN
-        view.messageLabel.setText("Login successful! Welcome, " + user.getDisplayName());
-        view.messageLabel.setStyle("-fx-text-fill: green;");
-        
+        // Clear message immediately
+        view.messageLabel.setText("");
         view.usernameField.clear();
         view.passwordField.clear();
         
-        // Pass both customer ID and username to BankingApp
-        bankingApp.handleSuccessfulLogin(user.getCustomerId(), username);
+        // CRITICAL FIX: Set current user in AccountController
+        if (bankingApp.accountController != null) {
+            bankingApp.accountController.setCurrentUser(user.getCustomerId());
+        }
         
-        // CLEAR THE MESSAGE AFTER A DELAY SO IT DOESN'T SHOW ON LOGOUT
-        new java.util.Timer().schedule( 
-            new java.util.TimerTask() {
-                @Override
-                public void run() {
-                    javafx.application.Platform.runLater(() -> {
-                        view.messageLabel.setText("");
-                    });
-                }
-            }, 
-            3000 // Clear after 3 seconds
-        );
+        // Ensure sample accounts are created for admin
+        AccountManager.ensureUserHasSampleAccounts(user.getCustomerId(), username);
+        
+        // Pass to BankingApp
+        bankingApp.handleSuccessfulLogin(user.getCustomerId(), username);
         
     } else {
         view.messageLabel.setText("Invalid username or password");

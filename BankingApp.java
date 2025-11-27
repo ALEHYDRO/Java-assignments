@@ -20,7 +20,7 @@ public class BankingApp extends Application {
     private DashboardController dashboardController;
     private RegistrationController registrationController;
     private OpenAccountController openAccountController;
-    private AccountController accountController;
+    public AccountController accountController;
 
     @Override
     public void start(Stage primaryStage) {
@@ -64,30 +64,75 @@ public class BankingApp extends Application {
 
     private String currentUsername;
     
-    // NEW: Handle successful login
-    public void handleSuccessfulLogin(String customerId, String username) {
-    this.currentCustomerId = customerId;
-    this.currentUsername = username;
+    // SESSION MANAGEMENT METHODS
     
-    // Ensure admin has sample accounts
-    if ("admin".equals(username)) {
-        AccountManager.ensureUserHasSampleAccounts(customerId, username);
+    /**
+     * Check if a user is currently logged in
+     */
+    public boolean isUserLoggedIn() {
+        return currentCustomerId != null && !currentCustomerId.isEmpty();
+    }
+    /**
+     * Handle logout - clear user session
+     */
+    public void logout() {
+        this.currentCustomerId = null;
+        this.currentUsername = null;
+        
+        // CLEAR ALL MESSAGES
+        if (loginView != null) loginView.messageLabel.setText("");
+        if (dashboardView != null) dashboardView.messageLabel.setText("");
+        
+        if (accountController != null) {
+        accountController.clearCurrentUser();
+    }
+
+        // GO BACK TO LOGIN SCREEN
+        showLoginView();
+    }
+
+    /**
+     * Get current customer ID
+     */
+    public String getCurrentCustomerId() {
+        return currentCustomerId;
+    }
+
+    /**
+     * Get current username
+     */
+    public String getCurrentUsername() {
+        return currentUsername;
+    }
+
+    /**
+     * Refresh accounts view with current user's data
+     */
+    public void refreshAccountsView() {
+        if (accountsView != null && isUserLoggedIn()) {
+            // Check if AccountsView has the loadAccountsForUser method
+            // If not, we'll need to call the accountController
+            accountController.refreshAccountData();
+        }
     }
     
-    accountController.setCurrentUser(customerId);
-    showDashboard();
-}
+    // NEW: Handle successful login
+    public void handleSuccessfulLogin(String customerId, String username) {
+        this.currentCustomerId = customerId;
+        this.currentUsername = username;
+        
+        // SET WELCOME MESSAGE ON DASHBOARD
+        dashboardView.welcomeLabel.setText("Welcome " + username + "!");
+        dashboardView.messageLabel.setText("Login successful! What would you like to do today?");
+        
+        showDashboard();
+    }
     
     // NEW: Handle logout
     public void handleLogout() {
         this.currentCustomerId = null;
         accountController.clearCurrentUser();
         showLoginView();
-    }
-    
-    // NEW: Get current customer ID
-    public String getCurrentCustomerId() {
-        return currentCustomerId;
     }
     
     // Navigation methods
@@ -126,10 +171,6 @@ public class BankingApp extends Application {
     public void showOpenAccountView() {
         primaryStage.setScene(openAccountView.getScene());
     }
-
-    public String getCurrentUsername() {
-    return currentUsername;
-}
 
     public static void main(String[] args) {
         launch(args);

@@ -13,7 +13,7 @@ public class DashboardController {
         view.depositButton.setOnAction(e -> bankingApp.showDepositView());
         view.withdrawButton.setOnAction(e -> bankingApp.showWithdrawView());
         view.transactionHistoryButton.setOnAction(e -> bankingApp.showTransactionHistoryView());
-        view.logoutButton.setOnAction(e -> bankingApp.handleLogout()); // Updated to use handleLogout()
+        view.logoutButton.setOnAction(e -> bankingApp.logout());
         view.openAccountButton.setOnAction(e -> bankingApp.showOpenAccountView());
     }
 }
